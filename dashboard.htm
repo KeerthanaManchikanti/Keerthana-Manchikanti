@@ -1,0 +1,41 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Personalized Gift Recommendation Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Personalized Gift Recommendation Platform</h1>
+        <p>Find the perfect gift for your loved ones!</p>
+    </header>
+
+    <div class="container">
+        <div class="section" id="questionnaire">
+            <h2>Recipient Details</h2>
+            <form id="giftForm">
+                <label for="recipientName">Recipient's Name:</label>
+                <input type="text" id="recipientName" placeholder="Enter recipient's name" required>
+
+                <label for="hobby">Recipient's Hobby:</label>
+                <input type="text" id="hobby" placeholder="Enter recipient's hobby (e.g., reading, gaming, painting)" required>
+
+                <label for="occasion">Occasion:</label>
+                <input type="text" id="occasion" placeholder="Enter the occasion (e.g., birthday, anniversary)" required>
+
+                <button type="submit">Get Recommendations</button>
+            </form>
+        </div>
+
+        <div class="section" id="recommendations">
+            <h2>Recommended Gifts</h2>
+            <div id="giftList"></div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>

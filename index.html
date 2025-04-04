@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personalized Gift Recommendation Platform</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: #f4f4f4;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        header {
+            background-color: #2c3e50;
+            color: white;
+            text-align: center;
+            padding: 20px;
+        }
+
+        header h1 {
+            font-size: 28px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .section {
+            margin-bottom: 20px;
+        }
+
+        .section h2 {
+            font-size: 22px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 5px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+
+        button {
+            background-color: #3498db;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        #recommendations {
+            display: none;
+        }
+
+        .gift-item {
+            background-color: #f9f9f9;
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border-left: 4px solid #3498db;
+        }
+
+        .gift-item h3 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .gift-item p {
+            font-size: 14px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Personalized Gift Recommendation Platform</h1>
+        <p>Find the perfect gift for your loved ones!</p>
+    </header>
+
+    <div class="container">
+        <div class="section" id="questionnaire">
+            <h2>Recipient Details</h2>
+            <form id="giftForm">
+                <label for="recipientName">Recipient's Name:</label>
+                <input type="text" id="recipientName" placeholder="Enter recipient's name" required>
+
+                <label for="hobby">Recipient's Hobby:</label>
+                <input type="text" id="hobby" placeholder="Enter recipient's hobby (e.g., reading, gaming, painting)" required>
+
+                <label for="occasion">Occasion:</label>
+                <input type="text" id="occasion" placeholder="Enter the occasion (e.g., birthday, anniversary)" required>
+
+                <button type="submit">Get Recommendations</button>
+            </form>
+        </div>
+
+        <div class="section" id="recommendations">
+            <h2>Recommended Gifts</h2>
+            <div id="giftList"></div>
+        </div>
+    </div>
+
+    <script>
+        const giftForm = document.getElementById('giftForm');
+        const recommendationsSection = document.getElementById('recommendations');
+        const giftList = document.getElementById('giftList');
+
+        // Mock gift recommendations with multiple gifts per hobby-occasion combination
+        const giftDatabase = {
+            reading: {
+                birthday: [
+                    { gift: "Bestseller Book Collection", reason: "A curated set of popular books to enjoy on their special day." },
+                    { gift: "Book Subscription Service", reason: "A monthly delivery of books tailored to their reading taste." },
+                    { gift: "Personalized Book Embosser", reason: "A unique tool to mark their books with a custom stamp." }
+                ],
+                anniversary: [
+                    { gift: "Customized Bookmark with Initials", reason: "A thoughtful keepsake to celebrate their love for reading." },
+                    { gift: "Romantic Novel Set", reason: "A collection of love stories to enjoy together." },
+                    { gift: "Book-Shaped Photo Frame", reason: "A sentimental gift to display a cherished memory." }
+                ],
+                holiday: [
+                    { gift: "Cozy Reading Blanket", reason: "Perfect for staying warm while reading during the holidays." },
+                    { gift: "Holiday-Themed Book Set", reason: "Festive stories to get into the holiday spirit." },
+                    { gift: "LED Book Light", reason: "A practical accessory for reading in low light." }
+                ],
+                graduation: [
+                    { gift: "E-Reader with Case", reason: "A practical gift for a graduate to carry their books anywhere." },
+                    { gift: "Inspirational Book Collection", reason: "Motivational reads to start their new chapter." },
+                    { gift: "Customized Bookends", reason: "A stylish way to organize their growing book collection." }
+                ]
+            },
+            gaming: {
+                birthday: [
+                    { gift: "Latest Gaming Console", reason: "An exciting gift for a gamer to enjoy the newest games." },
+                    { gift: "Gaming Gift Card", reason: "Allows them to choose their favorite games or in-game items." },
+                    { gift: "LED Gaming Keyboard", reason: "Enhances their gaming setup with a vibrant, responsive keyboard." }
+                ],
+                anniversary: [
+                    { gift: "Customized Game Controller", reason: "A personalized gift to make gaming sessions special." },
+                    { gift: "Co-op Game for Couples", reason: "A fun way to play together and celebrate their anniversary." },
+                    { gift: "Gaming-Themed Wall Art", reason: "A decorative piece for their gaming space." }
+                ],
+                holiday: [
+                    { gift: "Gaming Headset with Mic", reason: "Improves their gaming experience with clear audio during the holidays." },
+                    { gift: "Holiday Edition Game", reason: "A festive game to enjoy during the holiday season." },
+                    { gift: "Gaming Mouse Pad with RGB Lights", reason: "A stylish accessory for their gaming setup." }
+                ],
+                graduation: [
+                    { gift: "Ergonomic Gaming Chair", reason: "A comfortable chair for long gaming sessions as they start a new chapter." },
+                    { gift: "Portable Gaming Monitor", reason: "A practical gift for gaming on the go." },
+                    { gift: "Gaming Strategy Guide Book", reason: "Helps them master their favorite games." }
+                ]
+            },
+            cooking: {
+                birthday: [
+                    { gift: "Professional Chef Knife Set", reason: "A high-quality set for a cooking enthusiast to elevate their skills." },
+                    { gift: "Personalized Apron", reason: "A custom apron to make their cooking sessions special." },
+                    { gift: "Gourmet Spice Collection", reason: "A variety of spices to experiment with new flavors." }
+                ],
+                anniversary: [
+                    { gift: "Family Recipe Book", reason: "A sentimental gift to preserve and share family recipes." },
+                    { gift: "Cooking Class for Two", reason: "A fun experience to learn new recipes together." },
+                    { gift: "Engraved Cutting Board", reason: "A personalized kitchen item to cherish." }
+                ],
+                holiday: [
+                    { gift: "Holiday Baking Kit", reason: "Everything they need to bake festive treats." },
+                    { gift: "Festive Cookie Cutters", reason: "Perfect for creating holiday-themed baked goods." },
+                    { gift: "Hot Chocolate Making Kit", reason: "A cozy addition to their holiday cooking." }
+                ],
+                graduation: [
+                    { gift: "Multi-Function Kitchen Appliance", reason: "A practical tool for a graduate starting their own kitchen." },
+                    { gift: "Cookbook for Beginners", reason: "Helps them learn new recipes as they begin their journey." },
+                    { gift: "Set of Measuring Cups and Spoons", reason: "Essential tools for precise cooking." }
+                ]
+            },
+            traveling: {
+                birthday: [
+                    { gift: "Travel Backpack with Laptop Compartment", reason: "A versatile bag for their birthday adventures." },
+                    { gift: "World Map Scratch-Off Poster", reason: "A fun way to track their travels." },
+                    { gift: "Portable Charger", reason: "Keeps their devices powered during trips." }
+                ],
+                anniversary: [
+                    { gift: "Photo Album for Travel Memories", reason: "A sentimental way to store their shared travel experiences." },
+                    { gift: "Matching Luggage Tags", reason: "A cute and practical gift for traveling together." },
+                    { gift: "Travel Voucher", reason: "A contribution toward their next romantic getaway." }
+                ],
+                holiday: [
+                    { gift: "Travel Pillow and Eye Mask Set", reason: "Ensures comfort during holiday travel." },
+                    { gift: "Compact Travel Guide Book", reason: "Helps them plan their holiday trips." },
+                    { gift: "Waterproof Travel Pouch", reason: "Keeps their essentials safe during travel." }
+                ],
+                graduation: [
+                    { gift: "Travel Organizer Set", reason: "Helps a graduate stay organized on their post-graduation travels." },
+                    { gift: "Durable Water Bottle", reason: "A practical item for staying hydrated on the go." },
+                    { gift: "Travel Journal with Pen", reason: "A place to document their new adventures." }
+                ]
+            },
+            art: {
+                birthday: [
+                    { gift: "Professional Art Supply Kit", reason: "A comprehensive set for an artist to create on their birthday." },
+                    { gift: "Canvas Set with Easel", reason: "Everything they need to start a new painting." },
+                    { gift: "Art Instruction Book", reason: "Helps them improve their skills with new techniques." }
+                ],
+                anniversary: [
+                    { gift: "Customized Sketchbook", reason: "A personalized gift for their artistic journey together." },
+                    { gift: "Framed Art Print of Their Work", reason: "A sentimental way to celebrate their talent." },
+                    { gift: "Art Workshop for Two", reason: "A shared experience to create art together." }
+                ],
+                holiday: [
+                    { gift: "Holiday-Themed Paint Set", reason: "Perfect for creating festive artwork." },
+                    { gift: "LED Light Pad for Drawing", reason: "A useful tool for sketching during the holidays." },
+                    { gift: "Art Supply Organizer", reason: "Keeps their materials tidy during the busy season." }
+                ],
+                graduation: [
+                    { gift: "Digital Drawing Tablet", reason: "A modern tool for a graduate to explore digital art." },
+                    { gift: "Portfolio Case", reason: "A professional way to present their artwork." },
+                    { gift: "Art History Book", reason: "Inspires them as they start their artistic career." }
+                ]
+            },
+            sports: {
+                birthday: [
+                    { gift: "Sports Equipment for Their Favorite Game", reason: "A practical gift to enjoy their favorite sport." },
+                    { gift: "Fitness Tracker", reason: "Helps them monitor their performance on their birthday." },
+                    { gift: "Personalized Sports Jersey", reason: "A custom gift to show their team spirit." }
+                ],
+                anniversary: [
+                    { gift: "Tickets to a Sports Event", reason: "A memorable experience to enjoy together." },
+                    { gift: "Matching Sports Water Bottles", reason: "A practical gift for their active lifestyle." },
+                    { gift: "Sports-Themed Photo Frame", reason: "A sentimental way to display a shared memory." }
+                ],
+                holiday: [
+                    { gift: "Winter Sports Gear", reason: "Perfect for enjoying holiday activities like skiing or skating." },
+                    { gift: "Sports Recovery Kit", reason: "Helps them relax after holiday workouts." },
+                    { gift: "Sports Duffle Bag", reason: "A useful bag for their sports gear." }
+                ],
+                graduation: [
+                    { gift: "High-Quality Running Shoes", reason: "A practical gift for a graduate to stay active." },
+                    { gift: "Sports Training Guide", reason: "Helps them improve their skills as they start anew." },
+                    { gift: "Gym Membership Voucher", reason: "Encourages them to stay fit post-graduation." }
+                ]
+            },
+            other: {
+                birthday: [
+                    { gift: "Gift Card to Their Favorite Store", reason: "A versatile gift for their birthday, letting them choose what they love." },
+                    { gift: "Personalized Mug", reason: "A thoughtful and practical birthday gift." },
+                    { gift: "Subscription Box of Their Interest", reason: "A monthly surprise tailored to their preferences." }
+                ],
+                anniversary: [
+                    { gift: "Customized Photo Frame", reason: "A sentimental gift to celebrate their special day." },
+                    { gift: "Spa Day Voucher", reason: "A relaxing experience to enjoy together." },
+                    { gift: "Engraved Keychain Set", reason: "A small but meaningful gift for both." }
+                ],
+                holiday: [
+                    { gift: "Scented Candle Set", reason: "A cozy gift to enhance the holiday atmosphere." },
+                    { gift: "Board Game for Family", reason: "A fun way to spend the holidays together." },
+                    { gift: "Holiday Ornament", reason: "A keepsake to remember the season." }
+                ],
+                graduation: [
+                    { gift: "Inspirational Journal", reason: "A meaningful gift to start their new journey." },
+                    { gift: "Desk Organizer", reason: "A practical item for their new workspace." },
+                    { gift: "Motivational Wall Art", reason: "Inspires them as they begin their next chapter." }
+                ]
+            }
+        };
+
+        // Function to categorize the hobby input
+        function categorizeHobby(hobby) {
+            const hobbyLower = hobby.toLowerCase().trim();
+            if (hobbyLower.includes('read') || hobbyLower.includes('book') || hobbyLower.includes('literature')) return 'reading';
+            if (hobbyLower.includes('gam') || hobbyLower.includes('play') || hobbyLower.includes('video') || hobbyLower.includes('board')) return 'gaming';
+            if (hobbyLower.includes('cook') || hobbyLower.includes('bak') || hobbyLower.includes('chef') || hobbyLower.includes('kitchen')) return 'cooking';
+            if (hobbyLower.includes('travel') || hobbyLower.includes('explor') || hobbyLower.includes('adventure') || hobbyLower.includes('tour')) return 'traveling';
+            if (hobbyLower.includes('art') || hobbyLower.includes('paint') || hobbyLower.includes('draw') || hobbyLower.includes('sketch') || hobbyLower.includes('craft')) return 'art';
+            if (hobbyLower.includes('sport') || hobbyLower.includes('run') || hobbyLower.includes('swim') || hobbyLower.includes('gym') || hobbyLower.includes('fit')) return 'sports';
+            return 'other'; // Default category for unrecognized hobbies
+        }
+
+        // Function to categorize the occasion input
+        function categorizeOccasion(occasion) {
+            const occasionLower = occasion.toLowerCase().trim();
+            if (occasionLower.includes('birth') || occasionLower.includes('bday')) return 'birthday';
+            if (occasionLower.includes('anniv') || occasionLower.includes('wed') || occasionLower.includes('marriage') || occasionLower.includes('valentine')) return 'anniversary';
+            if (occasionLower.includes('holi') || occasionLower.includes('christ') || occasionLower.includes('new year') || occasionLower.includes('diwali') || occasionLower.includes('fest')) return 'holiday';
+            if (occasionLower.includes('grad') || occasionLower.includes('school') || occasionLower.includes('college') || occasionLower.includes('degree') || occasionLower.includes('congrat')) return 'graduation';
+            return 'birthday'; // Fallback to 'birthday' for unrecognized occasions
+        }
+
+        giftForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const recipientName = document.getElementById('recipientName').value.trim();
+            const hobbyInput = document.getElementById('hobby').value.trim();
+            const occasionInput = document.getElementById('occasion').value.trim();
+
+            if (!recipientName || !hobbyInput || !occasionInput) {
+                alert('Please fill out all fields.');
+                return;
+            }
+
+            // Categorize the hobby and occasion inputs
+            const hobbyCategory = categorizeHobby(hobbyInput);
+            const occasionCategory = categorizeOccasion(occasionInput);
+
+            // Debug: Log the categories to ensure they are correct
+            console.log('Hobby Category:', hobbyCategory);
+            console.log('Occasion Category:', occasionCategory);
+
+            // Get recommendations based on hobby category and occasion category
+            let recommendations;
+            try {
+                recommendations = giftDatabase[hobbyCategory][occasionCategory];
+                if (!recommendations || recommendations.length === 0) {
+                    throw new Error('No recommendations available');
+                }
+            } catch (error) {
+                giftList.innerHTML = '<p>No recommendations available for this combination. Try a different hobby or occasion.</p>';
+                recommendationsSection.style.display = 'block';
+                window.scrollTo(0, recommendationsSection.offsetTop);
+                return;
+            }
+
+            // Clear previous recommendations
+            giftList.innerHTML = '';
+
+            // Display all recommendations
+            recommendations.forEach(recommendation => {
+                const giftItem = document.createElement('div');
+                giftItem.classList.add('gift-item');
+                giftItem.innerHTML = `
+                    <h3>${recommendation.gift} for ${recipientName} (${occasionInput})</h3>
+                    <p>${recommendation.reason}</p>
+                `;
+                giftList.appendChild(giftItem);
+            });
+
+            // Show the recommendations section
+            recommendationsSection.style.display = 'block';
+            window.scrollTo(0, recommendationsSection.offsetTop);
+        });
+    </script>
+</body>
+</html>
